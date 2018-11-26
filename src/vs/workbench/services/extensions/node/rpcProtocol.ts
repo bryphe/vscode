@@ -126,6 +126,8 @@ export interface IRPCProtocolLogger {
 
 const noop = () => { };
 
+console.log("HELLO WORLD2: " + JSON.stringify(process.argv));
+
 export class RPCProtocol extends Disposable implements IRPCProtocol {
 
 	private static UNRESPONSIVE_TIME = 3 * 1000; // 3s
@@ -150,6 +152,7 @@ export class RPCProtocol extends Disposable implements IRPCProtocol {
 
 	constructor(protocol: IMessagePassingProtocol, logger: IRPCProtocolLogger | null = null, transformer: IURITransformer | null = null) {
 		super();
+        console.log("Hello from rpc protocol constructor");
 		this._protocol = protocol;
 		this._logger = logger;
 		this._uriTransformer = transformer;
@@ -454,6 +457,8 @@ export class RPCProtocol extends Disposable implements IRPCProtocol {
 		if (!actor) {
 			throw new Error('Unknown actor ' + getStringIdentifierForProxy(rpcId));
 		}
+    console.log("METHOD NAME: " + methodName);
+    console.log(" -- " + JSON.stringify(args));
 		let method = actor[methodName];
 		if (typeof method !== 'function') {
 			throw new Error('Unknown method ' + methodName + ' on actor ' + getStringIdentifierForProxy(rpcId));
@@ -830,3 +835,5 @@ const enum ArgType {
 	String = 1,
 	Buffer = 2
 }
+
+console.log("Hello from end of rpcProtocol");

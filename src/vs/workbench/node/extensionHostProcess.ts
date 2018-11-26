@@ -14,6 +14,8 @@ import { IInitData } from 'vs/workbench/api/node/extHost.protocol';
 import { MessageType, createMessageOfType, isMessageOfType } from 'vs/workbench/common/extensionHostProtocol';
 import { ExtensionHostMain, exit } from 'vs/workbench/node/extensionHostMain';
 
+console.log("Hello from extensionHostProcess");
+
 // With Electron 2.x and node.js 8.x the "natives" module
 // can cause a native crash (see https://github.com/nodejs/node/issues/19891 and
 // https://github.com/electron/electron/issues/10905). To prevent this from

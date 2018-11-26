@@ -6,13 +6,13 @@
 import * as vscode from 'vscode';
 import * as os from 'os';
 import * as platform from 'vs/base/common/platform';
-import * as terminalEnvironment from 'vs/workbench/parts/terminal/node/terminalEnvironment';
+// import * as terminalEnvironment from 'vs/workbench/parts/terminal/node/terminalEnvironment';
 import { Event, Emitter } from 'vs/base/common/event';
 import { ExtHostTerminalServiceShape, MainContext, MainThreadTerminalServiceShape, IMainContext, ShellLaunchConfigDto } from 'vs/workbench/api/node/extHost.protocol';
 import { ExtHostConfiguration } from 'vs/workbench/api/node/extHostConfiguration';
 import { ILogService } from 'vs/platform/log/common/log';
 import { EXT_HOST_CREATION_DELAY } from 'vs/workbench/parts/terminal/common/terminal';
-import { TerminalProcess } from 'vs/workbench/parts/terminal/node/terminalProcess';
+// import { TerminalProcess } from 'vs/workbench/parts/terminal/node/terminalProcess';
 import { timeout } from 'vs/base/common/async';
 
 const RENDERER_NO_PROCESS_ID = -1;
@@ -230,7 +230,7 @@ export class ExtHostTerminalService implements ExtHostTerminalServiceShape {
 	private _proxy: MainThreadTerminalServiceShape;
 	private _activeTerminal: ExtHostTerminal;
 	private _terminals: ExtHostTerminal[] = [];
-	private _terminalProcesses: { [id: number]: TerminalProcess } = {};
+	// private _terminalProcesses: { [id: number]: TerminalProcess } = {};
 	private _terminalRenderers: ExtHostTerminalRenderer[] = [];
 	private _getTerminalPromises: { [id: number]: Promise<ExtHostTerminal> } = {};
 
@@ -398,29 +398,29 @@ export class ExtHostTerminalService implements ExtHostTerminalServiceShape {
 		// Merge process env with the env from config
 		const env = { ...process.env };
 		// terminalEnvironment.mergeEnvironments(env, envFromConfig);
-		terminalEnvironment.mergeEnvironments(env, shellLaunchConfig.env);
+		// terminalEnvironment.mergeEnvironments(env, shellLaunchConfig.env);
 
 		// Continue env initialization, merging in the env from the launch
 		// config and adding keys that are needed to create the process
-		const locale = terminalConfig.get('setLocaleVariables') ? platform.locale : undefined;
-		terminalEnvironment.addTerminalEnvironmentKeys(env, locale);
+		// const locale = terminalConfig.get('setLocaleVariables') ? platform.locale : undefined;
+		// terminalEnvironment.addTerminalEnvironmentKeys(env, locale);
 
 		// Fork the process and listen for messages
 		this._logService.debug(`Terminal process launching on ext host`, shellLaunchConfig, initialCwd, cols, rows, env);
-		this._terminalProcesses[id] = new TerminalProcess(shellLaunchConfig, initialCwd, cols, rows, env);
-		this._terminalProcesses[id].onProcessIdReady(pid => this._proxy.$sendProcessPid(id, pid));
-		this._terminalProcesses[id].onProcessTitleChanged(title => this._proxy.$sendProcessTitle(id, title));
-		this._terminalProcesses[id].onProcessData(data => this._proxy.$sendProcessData(id, data));
-		this._terminalProcesses[id].onProcessExit((exitCode) => this._onProcessExit(id, exitCode));
+		// this._terminalProcesses[id] = new TerminalProcess(shellLaunchConfig, initialCwd, cols, rows, env);
+		// this._terminalProcesses[id].onProcessIdReady(pid => this._proxy.$sendProcessPid(id, pid));
+		// this._terminalProcesses[id].onProcessTitleChanged(title => this._proxy.$sendProcessTitle(id, title));
+		// this._terminalProcesses[id].onProcessData(data => this._proxy.$sendProcessData(id, data));
+		// this._terminalProcesses[id].onProcessExit((exitCode) => this._onProcessExit(id, exitCode));
 	}
 
 	public $acceptProcessInput(id: number, data: string): void {
-		this._terminalProcesses[id].input(data);
+		// this._terminalProcesses[id].input(data);
 	}
 
 	public $acceptProcessResize(id: number, cols: number, rows: number): void {
 		try {
-			this._terminalProcesses[id].resize(cols, rows);
+			// this._terminalProcesses[id].resize(cols, rows);
 		} catch (error) {
 			// We tried to write to a closed pipe / channel.
 			if (error.code !== 'EPIPE' && error.code !== 'ERR_IPC_CHANNEL_CLOSED') {
@@ -430,19 +430,19 @@ export class ExtHostTerminalService implements ExtHostTerminalServiceShape {
 	}
 
 	public $acceptProcessShutdown(id: number, immediate: boolean): void {
-		this._terminalProcesses[id].shutdown(immediate);
+		// this._terminalProcesses[id].shutdown(immediate);
 	}
 
-	private _onProcessExit(id: number, exitCode: number): void {
-		// Remove listeners
-		this._terminalProcesses[id].dispose();
+	// private _onProcessExit(id: number, exitCode: number): void {
+	// 	// Remove listeners
+	// 	this._terminalProcesses[id].dispose();
 
-		// Remove process reference
-		delete this._terminalProcesses[id];
+	// 	// Remove process reference
+	// 	delete this._terminalProcesses[id];
 
-		// Send exit event to main side
-		this._proxy.$sendProcessExit(id, exitCode);
-	}
+	// 	// Send exit event to main side
+	// 	this._proxy.$sendProcessExit(id, exitCode);
+	// }
 
 	private _getTerminalByIdEventually(id: number, retries: number = 5): Promise<ExtHostTerminal> {
 		if (!this._getTerminalPromises[id]) {

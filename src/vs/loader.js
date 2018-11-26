@@ -96,6 +96,7 @@ var AMDLoader;
 (function (AMDLoader) {
     var LoaderEvent = (function () {
         function LoaderEvent(type, detail, timestamp) {
+            console.log("Loader event: " + type);
             this.type = type;
             this.detail = detail;
             this.timestamp = timestamp;
@@ -563,6 +564,7 @@ var AMDLoader;
         }
         OnlyOnceScriptLoader.prototype.load = function (moduleManager, scriptSrc, callback, errorback) {
             var _this = this;
+            console.log("Load: " + scriptSrc + " | isNode " + this._env.isNode);
             if (!this._scriptLoader) {
                 this._scriptLoader = (this._env.isWebWorker
                     ? new WorkerScriptLoader()

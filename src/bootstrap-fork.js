@@ -6,7 +6,11 @@
 //@ts-check
 'use strict';
 
+console.log("before bootstrap");
+
 const bootstrap = require('./bootstrap');
+
+console.log("after bootstrap");
 
 // Enable ASAR in our forked processes
 bootstrap.enableASARSupport();
@@ -35,7 +39,9 @@ if (process.env['VSCODE_PARENT_PID']) {
 configureCrashReporter();
 
 // Load AMD entry point
+console.log("before amd load");
 require('./bootstrap-amd').load(process.env['AMD_ENTRYPOINT']);
+console.log("after amd load");
 
 //#region Helpers
 

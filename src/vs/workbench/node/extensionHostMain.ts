@@ -27,6 +27,8 @@ import { RPCProtocol } from 'vs/workbench/services/extensions/node/rpcProtocol';
 // uris that have no scheme
 setUriThrowOnMissingScheme(false);
 
+console.log("Hello from extensionHostMain");
+
 const nativeExit = process.exit.bind(process);
 function patchProcess(allowExit: boolean) {
 	process.exit = function (code?: number) {
@@ -70,6 +72,8 @@ export class ExtensionHostMain {
 	constructor(protocol: IMessagePassingProtocol, initData: IInitData) {
 		const uriTransformer: IURITransformer = null;
 		const rpcProtocol = new RPCProtocol(protocol, null, uriTransformer);
+
+        console.log("[DERP] extensionHostMain **");
 
 		// ensure URIs are transformed and revived
 		initData = this.transform(initData, rpcProtocol);
@@ -318,6 +322,7 @@ export class ExtensionHostMain {
 
 	private transform(initData: IInitData, rpcProtocol: RPCProtocol): IInitData {
 		initData.extensions.forEach((ext) => (<any>ext).extensionLocation = URI.revive(rpcProtocol.transformIncomingURIs(ext.extensionLocation)));
+        console.log("initData.extensions: " + initData.extensions.length);
 		initData.environment.appRoot = URI.revive(rpcProtocol.transformIncomingURIs(initData.environment.appRoot));
 		initData.environment.appSettingsHome = URI.revive(rpcProtocol.transformIncomingURIs(initData.environment.appSettingsHome));
 		initData.environment.extensionDevelopmentLocationURI = URI.revive(rpcProtocol.transformIncomingURIs(initData.environment.extensionDevelopmentLocationURI));
