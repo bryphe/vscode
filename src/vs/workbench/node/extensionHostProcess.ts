@@ -59,7 +59,7 @@ export class TestProtocol implements IMessagePassingProtocol {
         };
 
         let model = {
-            contents: null,
+            contents: {},
             keys: [],
             overrides: [],
         };

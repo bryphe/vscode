@@ -13,8 +13,8 @@ import { ExtHostConfiguration } from 'vs/workbench/api/node/extHostConfiguration
 import { FileIndexSearchManager } from 'vs/workbench/api/node/extHostSearch.fileIndex';
 import { FileSearchManager } from 'vs/workbench/services/search/node/fileSearchManager';
 import { SearchService } from 'vs/workbench/services/search/node/rawSearchService';
-import { RipgrepSearchProvider } from 'vs/workbench/services/search/node/ripgrepSearchProvider';
-import { OutputChannel } from 'vs/workbench/services/search/node/ripgrepSearchUtils';
+// import { RipgrepSearchProvider } from 'vs/workbench/services/search/node/ripgrepSearchProvider';
+// import { OutputChannel } from 'vs/workbench/services/search/node/ripgrepSearchUtils';
 import { isSerializedFileMatch } from 'vs/workbench/services/search/node/search';
 import { TextSearchManager } from 'vs/workbench/services/search/node/textSearchManager';
 import * as vscode from 'vscode';
@@ -46,7 +46,8 @@ export class ExtHostSearch implements ExtHostSearchShape {
 		this._fileSearchManager = new FileSearchManager();
 		this._fileIndexSearchManager = new FileIndexSearchManager();
 
-		registerEHProviders(this, _logService, configService);
+        // TODO: What is this?
+		// registerEHProviders(this, _logService, configService);
 	}
 
 	private _transformScheme(scheme: string): string {
@@ -175,14 +176,16 @@ export class ExtHostSearch implements ExtHostSearchShape {
 	}
 }
 
-function registerEHProviders(extHostSearch: ExtHostSearch, logService: ILogService, configService: ExtHostConfiguration) {
-	if (configService.getConfiguration('searchRipgrep').enable || configService.getConfiguration('search').runInExtensionHost) {
-		const outputChannel = new OutputChannel(logService);
-		extHostSearch.registerTextSearchProvider('file', new RipgrepSearchProvider(outputChannel));
+// TODO: Bring this back? We definitely want search!
 
-		extHostSearch.registerInternalFileSearchProvider('file', new SearchService());
-	}
-}
+// function registerEHProviders(extHostSearch: ExtHostSearch, logService: ILogService, configService: ExtHostConfiguration) {
+// 	if (configService.getConfiguration('searchRipgrep').enable || configService.getConfiguration('search').runInExtensionHost) {
+// 		const outputChannel = new OutputChannel(logService);
+// 		extHostSearch.registerTextSearchProvider('file', new RipgrepSearchProvider(outputChannel));
+
+// 		extHostSearch.registerInternalFileSearchProvider('file', new SearchService());
+// 	}
+// }
 
 function reviveQuery<U extends IRawQuery>(rawQuery: U): U extends IRawTextQuery ? ITextQuery : IFileQuery {
 	return {
