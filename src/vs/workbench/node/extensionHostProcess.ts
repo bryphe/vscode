@@ -3,16 +3,19 @@
  *  Licensed under the MIT License. See License.txt in the project root for license information.
  *--------------------------------------------------------------------------------------------*/
 
-import * as nativeWatchdog from 'native-watchdog';
-import { createConnection } from 'net';
+// import * as nativeWatchdog from 'native-watchdog';
+// import { createConnection } from 'net';
 import { onUnexpectedError } from 'vs/base/common/errors';
-import { Event, filterEvent } from 'vs/base/common/event';
+import { URI } from 'vs/base/common/uri';
+import { Event, filterEvent, Emitter } from 'vs/base/common/event';
 import { IMessagePassingProtocol } from 'vs/base/parts/ipc/node/ipc';
-import { Protocol } from 'vs/base/parts/ipc/node/ipc.net';
+// import { Protocol } from 'vs/base/parts/ipc/node/ipc.net';
 import product from 'vs/platform/node/product';
 import { IInitData } from 'vs/workbench/api/node/extHost.protocol';
 import { MessageType, createMessageOfType, isMessageOfType } from 'vs/workbench/common/extensionHostProtocol';
 import { ExtensionHostMain, exit } from 'vs/workbench/node/extensionHostMain';
+
+
 
 console.log("Hello from extensionHostProcess");
 
@@ -34,6 +37,54 @@ console.log("Hello from extensionHostProcess");
 	};
 })();
 
+// export interface IMessagePassingProtocol {
+// 	send(buffer: Buffer): void;
+// 	onMessage: Event<Buffer>;
+// }
+
+export class TestProtocol implements IMessagePassingProtocol {
+	private _onMessage = new Emitter<Buffer>();
+	readonly onMessage: Event<Buffer> = this._onMessage.event;
+
+    public send(buffer: Buffer): void {
+        console.log("[TestProtocol - Send] " + buffer.toString("utf8"));
+
+        console.log(URI.file("E:/vscode-test-logs").toString());
+
+        let environment = {
+            appRoot: "",
+            appSettingsHome: "",
+            extensionDevelopmentLocationURI: "",
+            workspace: "",
+        };
+
+        let model = {
+            contents: null,
+            keys: [],
+            overrides: [],
+        };
+
+        let configuration = {
+            defaults: model,
+            user: model,
+            workspace: model,
+            folders: {},
+            isComplete: true,
+        }
+
+        let initData = {
+            configuration,
+            logsLocation: URI.file("E:/vscode-test-logs"),
+            parentPid: process.pid, 
+            extensions: [],
+            environment,
+        };
+
+        this._onMessage.fire(new Buffer(JSON.stringify(initData)));
+    }   
+};
+
+
 interface IRendererConnection {
 	protocol: IMessagePassingProtocol;
 	initData: IInitData;
@@ -47,15 +98,17 @@ let onTerminate = function () {
 
 function createExtHostProtocol(): Promise<IMessagePassingProtocol> {
 
-	const pipeName = process.env.VSCODE_IPC_HOOK_EXTHOST;
+	// const pipeName = process.env.VSCODE_IPC_HOOK_EXTHOST;
 
 	return new Promise<IMessagePassingProtocol>((resolve, reject) => {
 
-		const socket = createConnection(pipeName, () => {
-			socket.removeListener('error', reject);
-			resolve(new Protocol(socket));
-		});
-		socket.once('error', reject);
+        resolve(new TestProtocol());
+
+		// const socket = createConnection(pipeName, () => {
+		// 	socket.removeListener('error', reject);
+		// 	resolve(new Protocol(socket));
+		// });
+		// socket.once('error', reject);
 
 	}).then(protocol => {
 
@@ -140,21 +193,23 @@ function connectToRenderer(protocol: IMessagePassingProtocol): Promise<IRenderer
 			// In certain cases, the event loop can become busy and never yield
 			// e.g. while-true or process.nextTick endless loops
 			// So also use the native node module to do it from a separate thread
-			let watchdog: typeof nativeWatchdog;
-			try {
-				watchdog = require.__$__nodeRequire('native-watchdog');
-				watchdog.start(initData.parentPid);
-			} catch (err) {
-				// no problem...
-				onUnexpectedError(err);
-			}
+			// let watchdog: typeof nativeWatchdog;
+			// try {
+			// 	watchdog = require.__$__nodeRequire('native-watchdog');
+			// 	watchdog.start(initData.parentPid);
+			// } catch (err) {
+			// 	// no problem...
+			// 	onUnexpectedError(err);
+			// }
 
 			// Tell the outside that we are initialized
+            console.log("extensionHostProcess.ts - Sending initialization message");
 			protocol.send(createMessageOfType(MessageType.Initialized));
 
 			c({ protocol, initData });
 		});
 
+            console.log("extensionHostProcess.ts - Sending ready message");
 		// Tell the outside that we are ready to receive messages
 		protocol.send(createMessageOfType(MessageType.Ready));
 	});

@@ -5,8 +5,8 @@
 
 import { join } from 'vs/base/common/paths';
 import { LogLevel } from 'vs/workbench/api/node/extHostTypes';
-import { ILogService, DelegatedLogService } from 'vs/platform/log/common/log';
-import { createSpdLogService } from 'vs/platform/log/node/spdlogService';
+import { ILogService, ConsoleLogService, DelegatedLogService } from 'vs/platform/log/common/log';
+// import { createSpdLogService } from 'vs/platform/log/node/spdlogService';
 import { ExtHostLogServiceShape } from 'vs/workbench/api/node/extHost.protocol';
 import { ExtensionHostLogFileName } from 'vs/workbench/services/extensions/common/extensions';
 import { URI } from 'vs/base/common/uri';
@@ -21,7 +21,8 @@ export class ExtHostLogService extends DelegatedLogService implements ILogServic
 		logLevel: LogLevel,
 		logsPath: string,
 	) {
-		super(createSpdLogService(ExtensionHostLogFileName, logLevel, logsPath));
+        // TODO: 
+		super(new ConsoleLogService());
 		this._logsPath = logsPath;
 		this.logFile = URI.file(join(logsPath, `${ExtensionHostLogFileName}.log`));
 	}

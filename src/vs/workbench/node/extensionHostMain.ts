@@ -27,8 +27,6 @@ import { RPCProtocol } from 'vs/workbench/services/extensions/node/rpcProtocol';
 // uris that have no scheme
 setUriThrowOnMissingScheme(false);
 
-console.log("Hello from extensionHostMain");
-
 const nativeExit = process.exit.bind(process);
 function patchProcess(allowExit: boolean) {
 	process.exit = function (code?: number) {
@@ -83,12 +81,19 @@ export class ExtensionHostMain {
 		const allowExit = !!this._environment.extensionTestsPath; // to support other test frameworks like Jasmin that use process.exit (https://github.com/Microsoft/vscode/issues/37708)
 		patchProcess(allowExit);
 
+        console.log("extensionHostMain - before log initialization");
+
 		// services
 		this._extHostLogService = new ExtHostLogService(initData.logLevel, initData.logsLocation.fsPath);
 		this.disposables.push(this._extHostLogService);
 
+        console.log("extensionHostMain - after log initialization");
+
 		this._searchRequestIdProvider = new Counter();
 		const extHostWorkspace = new ExtHostWorkspace(rpcProtocol, initData.workspace, this._extHostLogService, this._searchRequestIdProvider);
+
+        console.log("extensionHostMain - after workspace");
+
 
 		this._extHostLogService.info('extension host started');
 		this._extHostLogService.trace('initData', initData);
@@ -327,6 +332,7 @@ export class ExtensionHostMain {
 		initData.environment.appSettingsHome = URI.revive(rpcProtocol.transformIncomingURIs(initData.environment.appSettingsHome));
 		initData.environment.extensionDevelopmentLocationURI = URI.revive(rpcProtocol.transformIncomingURIs(initData.environment.extensionDevelopmentLocationURI));
 		initData.logsLocation = URI.revive(rpcProtocol.transformIncomingURIs(initData.logsLocation));
+        console.log("initData.logsLocation: " + initData.logsLocation);
 		initData.workspace = rpcProtocol.transformIncomingURIs(initData.workspace);
 		return initData;
 	}
