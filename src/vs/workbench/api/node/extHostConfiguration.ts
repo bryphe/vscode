@@ -188,6 +188,8 @@ export class ExtHostConfiguration implements ExtHostConfigurationShape {
 	}
 
 	private _validateConfigurationAccess(key: string, resource: URI, extensionId: string): void {
+        console.log("_validateConfigurationAccess: " + key + " | extensionId " + extensionId);
+        console.dir(this._configurationScopes);
 		const scope = OVERRIDE_PROPERTY_PATTERN.test(key) ? ConfigurationScope.RESOURCE : this._configurationScopes[key];
 		const extensionIdText = extensionId ? `[${extensionId}] ` : '';
 		if (ConfigurationScope.RESOURCE === scope) {

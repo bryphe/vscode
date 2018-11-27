@@ -70,6 +70,7 @@ export class TestProtocol implements IMessagePassingProtocol {
             workspace: model,
             folders: {},
             isComplete: true,
+            configurationScopes: { }
         }
 
         let initData = {
